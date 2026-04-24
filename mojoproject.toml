@@ -6,6 +6,7 @@ platforms = ["linux-64"]
 version = "0.1.0"
 
 [tasks]
+test = "bash -c 'for f in tests/test_*.mojo; do mojo -I src \"$f\" || exit 1; done'"
 
 [dependencies]
 mojo = ">=1.0.0b1.dev2026042317,<2"

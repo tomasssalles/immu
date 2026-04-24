@@ -22,6 +22,14 @@ Source images live in `assets/`. Naming convention:
 - `logo-head-{variant}.full-size.png` — emu head only, used for GitHub avatar, favicon, etc.
 - Variants so far: `light` (teal), `dark` (grey)
 
+## Mojo
+
+Always invoke the `mojo-syntax` skill before writing any Mojo code. It corrects pretrained knowledge with current syntax.
+
+- Mojo version in use: 0.26.3
+- Source files use the `.mojo` extension (`.🔥` is no longer supported)
+- Run a file with `mojo <file>` (no `run` subcommand needed)
+
 ## How we work
 
 - The **user does most of the coding** — this is a learning project.
