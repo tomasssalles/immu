@@ -4,9 +4,7 @@ from immu.collections_base import ImmuCollection, EmptyCollectionError, ImmuValu
 
 
 trait Stack(ImmuCollection):
-    comptime IteratorType[
-        iterable_mut: Bool, //, iterable_origin: Origin[mut=iterable_mut]
-    ]: Iterator
+    comptime TopDownIteratorType[iterable_origin: Origin[mut=False]]: Iterator
 
     def push(self, var value: Self.T) -> Self:
         ...
@@ -17,16 +15,31 @@ trait Stack(ImmuCollection):
     def top(self) raises EmptyCollectionError -> Self.T:
         ...
 
-    def iter_top_down(ref self) -> Self.IteratorType[origin_of(self)]:
+    def iter_top_down(ref self) -> Self.TopDownIteratorType[origin_of(self)]:
         ...
 
 
-struct COWStack[_T: ImmuValue](Stack):
+trait BottomUpIterableStack(Stack):
+    comptime BottomUpIteratorType[iterable_origin: Origin[mut=False]]: Iterator
+
+    def iter_bottom_up(ref self) -> Self.BottomUpIteratorType[origin_of(self)]:
+        ...
+
+
+struct COWStack[_T: ImmuValue](BottomUpIterableStack):
+    """
+    Copy-on-write stack that wraps a List object.
+
+    O(n) push and pop.
+
+    Each version stores its values efficiently in contiguous memory, and iteration is
+    therefore efficient, but different versions share no common structure, so if 
+    multiple versions exist simultaneously, each has a full copy of the data.
+    """
     comptime T = Self._T
 
-    comptime IteratorType[
-        iterable_mut: Bool, //, iterable_origin: Origin[mut=iterable_mut]
-    ]: Iterator = _ListIter[Self.T, iterable_origin, False]
+    comptime TopDownIteratorType[iterable_origin: Origin[mut=False]]: Iterator = _ListIter[Self.T, iterable_origin, False]
+    comptime BottomUpIteratorType[iterable_origin: Origin[mut=False]]: Iterator = _ListIter[Self.T, iterable_origin, True]
 
     var _list_ptr: ArcPointer[List[Self.T]]
 
@@ -65,8 +78,11 @@ struct COWStack[_T: ImmuValue](Stack):
         ref list = self._list_ptr[]
         return list[len(list) - 1]
 
-    def iter_top_down(ref self) -> Self.IteratorType[origin_of(self)]:
-        return rebind[Self.IteratorType[origin_of(self)]](reversed(self._list_ptr[]))
+    def iter_top_down(ref self) -> Self.TopDownIteratorType[origin_of(self)]:
+        return rebind[Self.TopDownIteratorType[origin_of(self)]](reversed(self._list_ptr[]))
+
+    def iter_bottom_up(ref self) -> Self.BottomUpIteratorType[origin_of(self)]:
+        return rebind[Self.BottomUpIteratorType[origin_of(self)]](iter(self._list_ptr[]))
 
     def __len__(self) -> Int:
         return len(self._list_ptr[])

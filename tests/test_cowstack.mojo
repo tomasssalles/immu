@@ -141,7 +141,7 @@ def test_immutable() raises:
     assert_equal(len(s4), 2)
 
 
-def test_iteration() raises:
+def test_top_down_iteration() raises:
     src_list = [1, 5, 7, 2, 9, 11, 3, 3, 42]
     s = COWStack(src_list.copy())
     assert_equal(s.top(), 42)
@@ -150,6 +150,18 @@ def test_iteration() raises:
     for v in s.iter_top_down():
         list.append(v)
     list.reverse()
+
+    assert_equal(list, src_list)
+
+
+def test_bottom_up_iteration() raises:
+    src_list = [1, 5, 7, 2, 9, 11, 3, 3, 42]
+    s = COWStack(src_list.copy())
+    assert_equal(s.top(), 42)
+    
+    list = List[Int]()
+    for v in s.iter_bottom_up():
+        list.append(v)
 
     assert_equal(list, src_list)
 
