@@ -2,23 +2,23 @@ comptime ImmuValue = Copyable
 comptime ImmuKey = Copyable & Hashable & Equatable
 
 
+@fieldwise_init
+struct EmptyCollectionError(TrivialRegisterPassable, Writable):
+    def write_to(self, mut writer: Some[Writer]):
+        writer.write("EmptyCollectionError")
+
+
 trait ImmuCollection(
+    ImplicitlyCopyable,
     Defaultable,
     Sized,
-    Boolable, 
-    Movable,
-    Copyable,
+    Boolable,
 ):
-    comptime _VT: ImmuValue
+    comptime T: ImmuValue
 
     def __bool__(self) -> Bool:
         return len(self) > 0
 
 
 trait ImmuSequence(ImmuCollection, Iterable):
-    ...
-
-
-@fieldwise_init
-struct EmptyCollectionError(Writable):
     ...
