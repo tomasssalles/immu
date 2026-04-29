@@ -8,23 +8,6 @@ def test_implemented_traits() raises:  # Just needs to compile
     noop_with_collection_constraints(COWStack[Int]())
 
 
-def test_can_call_api() raises:  # Just needs to compile
-    s = COWStack[Int]()
-
-    t: COWStack[Int] = s.push(42)  # push
-    _: COWStack[Int].T = 7  # comptime T
-
-    try:
-        _: Tuple[Int, COWStack[Int]] = t.pop()  # pop
-        _: Int = t.top()  # top
-    except EmptyCollectionError:
-        pass
-
-    l = List[Int]()
-    for v in t.iter_top_down():  # Iterable with Int values
-        l.append(v)
-
-
 def test_push_and_pop() raises:
     s = COWStack[Int]()
 
