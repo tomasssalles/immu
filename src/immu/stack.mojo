@@ -6,6 +6,15 @@ from immu.collections_base import ImmuCollection, EmptyCollectionError, ImmuValu
 trait Stack(ImmuCollection):
     comptime TopDownIteratorType[iterable_origin: Origin[mut=False]]: Iterator
 
+    def __init__(out self, var list: List[Self.T]):
+        """
+        Initialize the stack from a List representing the elements in _insertion_ order. That means
+        the first element of the list will be at the bottom of the stack and the last element at
+        the top. In particular, since stack iteration goes from top to bottom, iterating over
+        the resulting stack corresponds to the reverse List.
+        """
+        ...
+
     def push(self, var value: Self.T) -> Self:
         ...
 
@@ -47,12 +56,6 @@ struct COWStack[_T: ImmuValue](BottomUpIterableStack):
         self._list_ptr = ArcPointer(List[Self.T]())
 
     def __init__(out self, var list: List[Self.T]):
-        """
-        Initialize the stack from a List representing the elements in _insertion_ order. That means
-        the first element of the list will be at the bottom of the stack and the last element at
-        the top. In particular, since stack iteration goes from top to bottom, iterating over
-        the resulting stack corresponds to the reverse List.
-        """
         self._list_ptr = ArcPointer(list^)
 
     def _deepcopy(self) -> Self:
