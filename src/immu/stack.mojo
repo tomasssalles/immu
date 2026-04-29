@@ -121,13 +121,9 @@ struct _LinkedStackIter[T: ImmuValue](ImplicitlyCopyable, Iterator, Iterable):
 
     def __next__(mut self) raises StopIteration -> Self.Element:
         try:
-            pair = self.s.pop()
+            return self.s._mutate_pop()
         except EmptyCollectionError:
             raise StopIteration()
-
-        self.s = pair[1]
-        return pair[0].copy()
-        # TODO: Move stuff
 
     @always_inline
     def __iter__(ref self) -> Self.IteratorType[origin_of(self)]:
@@ -186,22 +182,25 @@ struct LinkedStack[_T: ImmuValue](Stack):
         new._len = self._len + 1
         return new^
 
-    def pop(self) raises EmptyCollectionError -> Tuple[Self.T, Self]:
+    def _mutate_pop(mut self) raises EmptyCollectionError -> Self.T:
         if not self._maybe_root_ptr:
             raise EmptyCollectionError()
 
         ref root = self._maybe_root_ptr.value()[]
-        var new_maybe_root_ptr: Optional[ArcPointer[Self._NodeT]]
-        if not root.maybe_next_node_ref:
-            new_maybe_root_ptr = None
-        else:
-            new_maybe_root_ptr = root.maybe_next_node_ref.value().ptr
 
-        new = Self()
-        new._maybe_root_ptr = new_maybe_root_ptr
-        new._len = self._len - 1
-        return (root.value.copy(), new^)
+        if not root.maybe_next_node_ref:
+            self._maybe_root_ptr = None
+        else:
+            self._maybe_root_ptr = root.maybe_next_node_ref.value().ptr
         
+        self._len -= 1
+
+        return root.value.copy()
+
+    def pop(self) raises EmptyCollectionError -> Tuple[Self.T, Self]:
+        new = self.copy()
+        value = new._mutate_pop()
+        return (value^, new^)
 
     def top(self) raises EmptyCollectionError -> ref[origin_of(self._maybe_root_ptr.value()[].value)] Self.T:
         if not self._maybe_root_ptr:
