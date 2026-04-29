@@ -1,5 +1,5 @@
-comptime ImmuValue = Copyable
-comptime ImmuKey = Copyable & Hashable & Equatable
+comptime ImmuValue = Copyable & ImplicitlyDestructible
+comptime ImmuKey = Copyable & ImplicitlyDestructible & Hashable & Equatable
 
 
 @fieldwise_init

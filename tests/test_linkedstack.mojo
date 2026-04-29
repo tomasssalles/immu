@@ -1,17 +1,16 @@
 from std.testing import *
 from tests.utils import *
 from immu.collections_base import EmptyCollectionError
-from immu.stack import COWStack
+from immu.stack import LinkedStack
 
 
 def test_implemented_traits() raises:  # Just needs to compile
-    noop_with_collection_constraints(COWStack[Int]())
-    noop_with_stack_constraint(COWStack[Int]())
-    noop_with_bottom_up_iterable_stack_constraint(COWStack[Int]())
+    noop_with_collection_constraints(LinkedStack[Int]())
+    noop_with_stack_constraint(LinkedStack[Int]())
 
 
 def test_push_and_pop() raises:
-    s = COWStack[Int]()
+    s = LinkedStack[Int]()
 
     with assert_raises_custom[EmptyCollectionError]():
         _ = s.pop()
@@ -40,7 +39,7 @@ def test_push_and_pop() raises:
 
 
 def test_len_and_bool() raises:
-    s = COWStack[Int]()
+    s = LinkedStack[Int]()
     assert_equal(len(s), 0)
     assert_false(s)
 
@@ -64,7 +63,7 @@ def test_len_and_bool() raises:
 
 
 def test_top() raises:
-    s = COWStack[Int]()
+    s = LinkedStack[Int]()
 
     with assert_raises_custom[EmptyCollectionError]():
         _ = s.top()
@@ -83,7 +82,7 @@ def test_top() raises:
 
 
 def test_from_list() raises:
-    s = COWStack([1, 2, 3, 999, 7])
+    s = LinkedStack([1, 2, 3, 999, 7])
     assert_equal(len(s), 5)
     
     (v, s) = s.pop()
@@ -101,7 +100,7 @@ def test_from_list() raises:
 
 
 def test_immutable() raises:
-    s0 = COWStack[Int]()
+    s0 = LinkedStack[Int]()
     s1 = s0.push(7)
     s2 = s1.push(42)
     s3a = s2.push(9)
@@ -128,7 +127,7 @@ def test_immutable() raises:
 
 def test_top_down_iteration() raises:
     src_list = [1, 5, 7, 2, 9, 11, 3, 3, 42]
-    s = COWStack(src_list.copy())
+    s = LinkedStack(src_list.copy())
     assert_equal(s.top(), 42)
     
     list = List[Int]()
@@ -139,16 +138,15 @@ def test_top_down_iteration() raises:
     assert_equal(list, src_list)
 
 
-def test_bottom_up_iteration() raises:
-    src_list = [1, 5, 7, 2, 9, 11, 3, 3, 42]
-    s = COWStack(src_list.copy())
-    assert_equal(s.top(), 42)
-    
-    list = List[Int]()
-    for v in s.iter_bottom_up():
-        list.append(v)
+def test_iterator_bounds() raises:
+    s = LinkedStack([1, 5, 7, 2, 9, 11, 3, 3, 42])
+    it = s.iter_top_down()
+    assert_equal(it.bounds(), (9, Optional(9)))
 
-    assert_equal(list, src_list)
+    _ = next(it)
+    _ = next(it)
+    _ = next(it)
+    assert_equal(it.bounds(), (6, Optional(6)))
 
 
 def main() raises: 

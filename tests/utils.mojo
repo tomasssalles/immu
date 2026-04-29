@@ -1,9 +1,18 @@
 from std.reflection import *
+from immu.stack import Stack, BottomUpIterableStack
 
 
 def noop_with_collection_constraints[
     C: ImplicitlyCopyable & Defaultable & Boolable & Sized
 ](value: C):
+    pass
+
+
+def noop_with_stack_constraint[C: Stack](value: C):
+    pass
+
+
+def noop_with_bottom_up_iterable_stack_constraint[C: BottomUpIterableStack](value: C):
     pass
 
 
