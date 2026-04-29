@@ -89,5 +89,3 @@ struct COWStack[_T: ImmuValue](BottomUpIterableStack):
 
     def __len__(self) -> Int:
         return len(self._list_ptr[])
-
-    # TODO: Make tests generic
