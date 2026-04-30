@@ -75,9 +75,6 @@ trait Queue(Collection):
     def front(self) raises EmptyCollectionError -> Self.T:
         ...
 
-    def back(self) raises EmptyCollectionError -> Self.T:
-        ...
-
 
 trait IterableQueue(Queue, Sequence):
     ...

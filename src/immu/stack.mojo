@@ -89,7 +89,7 @@ struct _LinkedStackIter[T: CollectionValue](ImplicitlyCopyable, Iterator, Iterab
 
     def __next__(mut self) raises StopIteration -> Self.Element:
         try:
-            return self.s._mutate_pop()
+            return self.s._mutating_pop()
         except EmptyCollectionError:
             raise StopIteration()
 
@@ -150,7 +150,7 @@ struct LinkedStack[_T: CollectionValue](Stack):
         new._len = self._len + 1
         return new^
 
-    def _mutate_pop(mut self) raises EmptyCollectionError -> Self.T:
+    def _mutating_pop(mut self) raises EmptyCollectionError -> Self.T:
         if not self._maybe_root_ptr:
             raise EmptyCollectionError()
 
@@ -167,7 +167,7 @@ struct LinkedStack[_T: CollectionValue](Stack):
 
     def pop(self) raises EmptyCollectionError -> Tuple[Self.T, Self]:
         new = self.copy()
-        value = new._mutate_pop()
+        value = new._mutating_pop()
         return (value^, new^)
 
     def top(self) raises EmptyCollectionError -> ref[origin_of(self._maybe_root_ptr.value()[].value)] Self.T:
