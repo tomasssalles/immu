@@ -1,12 +1,17 @@
 from std.testing import *
 from tests.utils import *
-from immu.collections_base import EmptyCollectionError
+from immu.traits import EmptyCollectionError
 from immu.stack import LinkedStack
 
 
 def test_implemented_traits() raises:  # Just needs to compile
-    noop_with_collection_constraints(LinkedStack[Int]())
-    noop_with_stack_constraint(LinkedStack[Int]())
+    s = LinkedStack[Int]()
+    noop_implicitly_copyable(s)
+    noop_defaultable(s)
+    noop_sized(s)
+    noop_booleable(s)
+    noop_collection(s)
+    noop_stack(s)
 
 
 def test_push_and_pop() raises:

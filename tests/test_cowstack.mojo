@@ -1,13 +1,18 @@
 from std.testing import *
 from tests.utils import *
-from immu.collections_base import EmptyCollectionError
+from immu.traits import EmptyCollectionError
 from immu.stack import COWStack
 
 
 def test_implemented_traits() raises:  # Just needs to compile
-    noop_with_collection_constraints(COWStack[Int]())
-    noop_with_stack_constraint(COWStack[Int]())
-    noop_with_bottom_up_iterable_stack_constraint(COWStack[Int]())
+    s = COWStack[Int]()
+    noop_implicitly_copyable(s)
+    noop_defaultable(s)
+    noop_sized(s)
+    noop_booleable(s)
+    noop_collection(s)
+    noop_stack(s)
+    noop_bottom_up_iterable_stack(s)
 
 
 def test_push_and_pop() raises:

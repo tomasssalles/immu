@@ -1,43 +1,11 @@
 from std.collections.list import _ListIter
 from std.memory import ArcPointer
-from immu.collections_base import ImmuCollection, EmptyCollectionError, ImmuValue
+from immu.traits import CollectionValue, EmptyCollectionError, Stack, BottomUpIterableStack
 
 
-trait Stack(ImmuCollection):
-    comptime TopDownIteratorType[iterable_origin: Origin[mut=False]]: Iterator
-
-    def __init__(out self, var list: List[Self.T]):
-        """
-        Initialize the stack from a List representing the elements in _insertion_ order. That means
-        the first element of the list will be at the bottom of the stack and the last element at
-        the top. In particular, since stack iteration goes from top to bottom, iterating over
-        the resulting stack corresponds to the reverse List.
-        """
-        ...
-
-    def push(self, var value: Self.T) -> Self:
-        ...
-
-    def pop(self) raises EmptyCollectionError -> Tuple[Self.T, Self]:
-        ...
-
-    def top(self) raises EmptyCollectionError -> Self.T:
-        ...
-
-    def iter_top_down(ref self) -> Self.TopDownIteratorType[origin_of(self)]:
-        ...
-
-
-trait BottomUpIterableStack(Stack):
-    comptime BottomUpIteratorType[iterable_origin: Origin[mut=False]]: Iterator
-
-    def iter_bottom_up(ref self) -> Self.BottomUpIteratorType[origin_of(self)]:
-        ...
-
-
-struct COWStack[_T: ImmuValue](BottomUpIterableStack):
+struct COWStack[_T: CollectionValue](BottomUpIterableStack):
     """
-    Copy-on-write stack that wraps a List object.
+    Copy-on-write persistent stack wrapping a List object.
 
     O(n) push and pop.
 
@@ -91,14 +59,14 @@ struct COWStack[_T: ImmuValue](BottomUpIterableStack):
         return len(self._list_ptr[])
 
 
-struct _NodeRef[T: ImmuValue](Copyable):
+struct _NodeRef[T: CollectionValue](Copyable):
     var ptr: ArcPointer[_Node[Self.T]]
 
     def __init__(out self, var ptr: ArcPointer[_Node[Self.T]]):
         self.ptr = ptr^
 
 
-struct _Node[T: ImmuValue](Copyable):
+struct _Node[T: CollectionValue](Copyable):
     var value: Self.T
     var maybe_next_node_ref: Optional[_NodeRef[Self.T]]
 
@@ -107,7 +75,7 @@ struct _Node[T: ImmuValue](Copyable):
         self.maybe_next_node_ref = maybe_next_node_ref^
 
 
-struct _LinkedStackIter[T: ImmuValue](ImplicitlyCopyable, Iterator, Iterable):
+struct _LinkedStackIter[T: CollectionValue](ImplicitlyCopyable, Iterator, Iterable):
     comptime Element = Self.T
 
     comptime IteratorType[
@@ -134,9 +102,9 @@ struct _LinkedStackIter[T: ImmuValue](ImplicitlyCopyable, Iterator, Iterable):
         return (len(self.s), {len(self.s)})
 
 
-struct LinkedStack[_T: ImmuValue](Stack):
+struct LinkedStack[_T: CollectionValue](Stack):
     """
-    Stack implemented via a persistent singly-linked list.
+    Persistent stack implemented as a persistent singly-linked list.
 
     O(1) push and pop.
 
