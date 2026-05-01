@@ -24,6 +24,20 @@ trait Sequence(Collection, Iterable):
     ...
 
 
+trait ReversibleSequence(Sequence):
+    comptime ReverseIteratorType[iterable_origin: Origin[mut=False]]: Iterator
+
+    def __reversed__(ref self) -> Self.ReverseIteratorType[origin_of(self)]:
+        """
+        Note: Mojo doesn't yet have a plain 'Reversible' trait for this, and the builtin
+        standalone 'reversed' function only has a few very type-specific overloads. So for
+        now, users will have to explicitly call 's.__reversed__()', which is not so pretty.
+        But using this signature means we can later conform to a future 'Reversible' trait,
+        probably without breaking changes to existing code that uses immu.
+        """
+        ...
+
+
 trait Stack(Collection):
     comptime TopDownIteratorType[iterable_origin: Origin[mut=False]]: Iterator
 
@@ -78,3 +92,17 @@ trait Queue(Collection):
 
 trait IterableQueue(Queue, Sequence):
     ...
+
+
+trait Vector(ReversibleSequence):
+    def __init__(out self, var list: List[Self.T]):
+        ...
+
+    def append(self, var value: Self.T) -> Self:
+        ...
+
+    def pop(self) raises EmptyCollectionError -> Tuple[Self.T, Self]:
+        ...
+
+    def __getitem__(ref self, idx: Some[Indexer]) -> ref[self] Self.T:
+        ...
