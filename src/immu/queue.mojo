@@ -76,7 +76,7 @@ struct StacksQueue[_T: CollectionValue](Queue):
         new._mutating_shift_if_needed()
         return (value^, new^)
 
-    def front(self) raises EmptyCollectionError -> ref[origin_of(self._front.top())] Self.T:
+    def front(self) raises EmptyCollectionError -> ref[self._front.top()] Self.T:
         # Here, we rely on the invariant: If the queue is not empty, then the _front stack is not empty.
         # So if the _front raises an EmptyCollectionError because it has no top, that means the queue is
         # completely empty and we want the exception to propagate.

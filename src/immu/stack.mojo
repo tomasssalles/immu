@@ -42,7 +42,7 @@ struct COWStack[_T: CollectionValue](BottomUpIterableStack):
         value = new._list_ptr[].pop()
         return (value^, new^)
 
-    def top(self) raises EmptyCollectionError -> ref[origin_of(self._list_ptr[])] Self.T:
+    def top(self) raises EmptyCollectionError -> ref[self._list_ptr[]] Self.T:
         if not self:
             raise EmptyCollectionError()
 
@@ -94,7 +94,7 @@ struct _LinkedStackIter[T: CollectionValue](ImplicitlyCopyable, Iterator, Iterab
             raise StopIteration()
 
     @always_inline
-    def __iter__(ref self) -> Self.IteratorType[origin_of(self)]:
+    def __iter__(ref self) -> Self.IteratorType[origin_of(v)]:
         return self.copy()
 
     @always_inline
@@ -170,7 +170,7 @@ struct LinkedStack[_T: CollectionValue](Stack):
         value = new._mutating_pop()
         return (value^, new^)
 
-    def top(self) raises EmptyCollectionError -> ref[origin_of(self._maybe_root_ptr.value()[].value)] Self.T:
+    def top(self) raises EmptyCollectionError -> ref[self._maybe_root_ptr.value()[].value] Self.T:
         if not self._maybe_root_ptr:
             raise EmptyCollectionError()
 

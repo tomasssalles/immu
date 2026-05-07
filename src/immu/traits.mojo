@@ -104,5 +104,5 @@ trait Vector(ReversibleSequence):
     def pop(self) raises EmptyCollectionError -> Tuple[Self.T, Self]:
         ...
 
-    def __getitem__(ref self, idx: Some[Indexer]) -> ref[self] Self.T:
+    def __getitem__(self, idx: Some[Indexer]) -> Self.T:
         ...
